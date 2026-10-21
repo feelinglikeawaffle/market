@@ -1,29 +1,28 @@
 let save = JSON.parse(localStorage.getItem("marketRogues")) || {
+
     prestige: 0,
+
     upgrades: {
         cash: 0,
         luck: 0,
         scan: 0
     }
+
 };
 
-let day = 1.00;
+let day = 1.0;
 
-let cash = 1000 * (1 + (save.upgrades.cash * 0.10));
+let cash =
+    1000 *
+    (1 + (save.upgrades.cash * 0.10));
+
 let prestigeCurrency = save.prestige;
+
 let hedgeDays = 0;
 
 let stocks = [];
-let portfolio = {};
 
-const stockColors = [
-    "#00ff88",
-    "#00aaff",
-    "#ffaa00",
-    "#ff44aa",
-    "#ff4444",
-    "#ffffff"
-];
+let portfolio = {};
 
 const names = [
     "NovaTech",
@@ -36,61 +35,61 @@ const names = [
     "Void Industries"
 ];
 
-const sectors = [
-    "AI",
-    "Energy",
-    "Crypto",
-    "Mining",
-    "Defense",
-    "Biotech"
-];
-
-function rng(a,b){
-    return Math.random() * (b-a) + a;
+function rng(a, b) {
+    return Math.random() * (b - a) + a;
 }
 
-function createStocks(){
+function createStocks() {
 
-    stocks=[];
+    stocks = [];
 
-    for(let i=0;i<6;i++){
+    for (let i = 0; i < 6; i++) {
 
-        let base = rng(20,100);
+        let base = rng(20, 100);
 
         stocks.push({
 
             name:
-            names[Math.floor(Math.random()*names.length)]
-            +" "
-            +Math.floor(rng(1,99)),
+                names[Math.floor(
+                    Math.random() * names.length
+                )] +
+                " " +
+                Math.floor(rng(1, 99)),
 
-            sector:
-            sectors[Math.floor(Math.random()*sectors.length)],
+            sector: [
+                "AI",
+                "Energy",
+                "Crypto",
+                "Mining",
+                "Defense",
+                "Biotech"
+            ][Math.floor(Math.random() * 6)],
 
-            price:base,
+            price: base,
 
-            growth:rng(-0.0003,0.0008),
+            growth: rng(-0.02, 0.05),
 
-            volatility:rng(0.01,0.08),
+            volatility: rng(0.03, 0.18),
 
-            momentum:rng(-5,5),
+            momentum: rng(-25, 25),
 
             fundamentals:
-            Math.floor(rng(20,100)),
+                Math.floor(rng(1, 100)),
 
             hype:
-            Math.floor(rng(1,100)),
+                Math.floor(rng(1, 100)),
 
             stability:
-            Math.floor(rng(20,100)),
+                Math.floor(rng(1, 100)),
 
-            risk:0,
+            risk: 0,
 
-            dailyChange:0,
+            dailyChange: 0,
 
-            signal:"➖ Sideways",
+            signal: "➖ Sideways",
 
-            history:[base]
+            history: [base]
+
         });
 
     }
@@ -99,27 +98,25 @@ function createStocks(){
 
 createStocks();
 
-function log(text){
+function log(text) {
 
-    const div =
-    document.getElementById("log");
+    let div = document.getElementById("log");
 
     div.innerHTML =
-    "<div>"+text+"</div>"
-    +
-    div.innerHTML;
+        "<div>" + text + "</div>" +
+        div.innerHTML;
 
 }
 
-function marketScan(){
+function marketScan() {
 
-    const best =
-    [...stocks].sort(
-        (a,b)=>
-        (b.growth+b.fundamentals/1000)
-        -
-        (a.growth+a.fundamentals/1000)
-    )[0];
+    let best = [...stocks]
+        .sort(
+            (a, b) =>
+                (b.growth + b.momentum / 100)
+                -
+                (a.growth + a.momentum / 100)
+        )[0];
 
     log(
         "🔍 Scan predicts " +
@@ -129,58 +126,57 @@ function marketScan(){
 
 }
 
-function hedge(){
+function hedge() {
 
-    if(hedgeDays>0)
+    if (hedgeDays > 0) {
         return;
+    }
 
-    hedgeDays=5;
+    hedgeDays = 5;
 
-    log(
-        "🛡 Hedge activated."
-    );
+    log("🛡 Hedge activated.");
 
 }
 
-function randomEvent(){
+function randomEvent() {
 
-    const roll =
-    Math.random();
+    let roll = Math.random();
 
-    if(roll<0.15){
+    if (roll < 0.15) {
 
-        stocks.forEach(s=>{
-            s.price*=1.05;
+        stocks.forEach(s => {
+
+            s.price *= 1.4;
+
         });
 
         log("🚀 AI BOOM");
 
     }
-    else if(roll<0.25){
 
-        stocks.forEach(s=>{
+    else if (roll < 0.25) {
 
-            if(hedgeDays<=0){
+        stocks.forEach(s => {
 
-                s.price*=0.95;
-
-            }
+            if (hedgeDays <= 0)
+                s.price *= 0.70;
 
         });
 
         log("💥 MARKET CRASH");
 
     }
-    else if(roll<0.35){
 
-        const target =
-        stocks[
-        Math.floor(
-            Math.random()*stocks.length
-        )
-        ];
+    else if (roll < 0.35) {
 
-        target.price*=1.12;
+        let target =
+            stocks[
+            Math.floor(
+                Math.random() * stocks.length
+            )
+            ];
+
+        target.price *= 2;
 
         log(
             "🔥 MEME STOCK: "
@@ -191,260 +187,122 @@ function randomEvent(){
 
 }
 
-function drawChart(){
+function tick() {
 
-    const canvas =
-    document.getElementById(
-        "marketChart"
-    );
+    day+= 0.2;
 
-    if(!canvas) return;
-
-    const ctx =
-    canvas.getContext("2d");
-
-    ctx.clearRect(
-        0,0,
-        canvas.width,
-        canvas.height
-    );
-
-    ctx.fillStyle="#151515";
-    ctx.fillRect(
-        0,
-        0,
-        canvas.width,
-        canvas.height
-    );
-
-    let all=[];
-
-    stocks.forEach(stock=>{
-
-        all.push(
-            ...stock.history
-        );
-
-    });
-
-    const globalMin =
-    Math.min(...all);
-
-    let globalMax =
-    Math.max(...all);
-
-    if(globalMax===globalMin)
-        globalMax++;
-
-    stocks.forEach(
-    (stock,index)=>{
-
-        const color=
-        stockColors[
-        index%
-        stockColors.length
-        ];
-
-        ctx.beginPath();
-        ctx.strokeStyle=color;
-        ctx.lineWidth=2;
-
-        stock.history.forEach(
-        (value,i)=>{
-
-            const x=
-            (
-            i/
-            (stock.history.length-1)
-            )
-            *
-            canvas.width;
-
-            const y=
-            canvas.height
-            -
-            (
-            (value-globalMin)
-            /
-            (globalMax-globalMin)
-            )
-            *
-            canvas.height;
-
-            if(i===0){
-
-                ctx.moveTo(x,y);
-
-            }else{
-
-                ctx.lineTo(x,y);
-
-            }
-
-        });
-
-        ctx.stroke();
-
-    });
-
-}
-
-function tick(){
-
-    day += 0.05;
-
-    if(hedgeDays>0)
+    if (hedgeDays > 0)
         hedgeDays--;
 
-    stocks.forEach(stock=>{
+    stocks.forEach(stock => {
 
-        const oldPrice=
-        stock.price;
+        let oldPrice = stock.price;
 
-        let move = 0;
+        let move =
 
-        move += stock.growth;
+            stock.growth +
 
-        move +=
-        stock.momentum
-        *0.00001;
+            (stock.momentum / 2000) +
 
-        move +=
-        (
-        stock.fundamentals
-        -50
-        )
-        *0.000002;
+            ((stock.fundamentals - 50) / 5000) +
 
-        move +=
-        (
-        stock.hype
-        -50
-        )
-        *0.000001;
+            ((stock.hype - 50) / 8000) +
 
-        move +=
-        (
-        Math.random()-0.5
-        )
-        *
-        stock.volatility
-        *
-        0.01;
+            ((Math.random() - 0.5)
+                * stock.volatility);
 
-        stock.price *=
-        (1+move);
+        stock.price *= 1 + move;
 
-        if(stock.price<1)
-            stock.price=1;
+        if (stock.price < 1)
+            stock.price = 1;
 
         stock.dailyChange =
-        (
-        (stock.price-oldPrice)
-        /
-        oldPrice
-        )*100;
+            (
+                (stock.price - oldPrice)
+                /
+                oldPrice
+            ) * 100;
 
         stock.momentum =
-        (
-        stock.momentum
-        *0.98
-        )
-        +
-        (
-        stock.dailyChange
-        *0.02
-        );
+            (stock.momentum * 0.8)
+            +
+            (stock.dailyChange * 0.6);
 
-        stock.history.push(
-            stock.price
-        );
+        stock.history.push(stock.price);
 
-        if(
-        stock.history.length>120
-        ){
+        if (stock.history.length > 20)
             stock.history.shift();
-        }
 
-        const avg5 =
-        stock.history
-        .slice(-5)
-        .reduce((a,b)=>a+b,0)
-        /
-        Math.min(
-        5,
-        stock.history.length
-        );
+        let avg5 =
+            stock.history
+                .slice(-5)
+                .reduce((a, b) => a + b, 0)
+            /
+            Math.min(
+                5,
+                stock.history.length
+            );
 
-        const avg20 =
-        stock.history
-        .slice(-20)
-        .reduce((a,b)=>a+b,0)
-        /
-        Math.min(
-        20,
-        stock.history.length
-        );
+        let avg10 =
+            stock.history
+                .slice(-10)
+                .reduce((a, b) => a + b, 0)
+            /
+            Math.min(
+                10,
+                stock.history.length
+            );
 
-        if(avg5>avg20*1.02){
-
-            stock.signal =
-            "🔥 Uptrend";
-
-        }
-        else if(
-            avg5<avg20*0.98
-        ){
+        if (avg5 > avg10 * 1.05) {
 
             stock.signal =
-            "💀 Downtrend";
+                "🔥 Uptrend";
 
         }
-        else{
+        else if (avg5 < avg10 * 0.95) {
 
             stock.signal =
-            "➖ Sideways";
+                "💀 Downtrend";
+
+        }
+        else {
+
+            stock.signal =
+                "➖ Sideways";
 
         }
 
         stock.risk =
-        stock.volatility*200
-        +
-        stock.hype*0.2
-        +
-        (
-        100-stock.stability
-        );
+
+            (stock.volatility * 300)
+
+            +
+
+            (stock.hype * 0.4)
+
+            +
+
+            (100 - stock.stability);
 
     });
 
-    if(Math.random()<0.005)
+    if (Math.random() < 0.35)
         randomEvent();
 
     render();
 
 }
 
-function buy(i){
+function buy(i) {
 
-    const stock = stocks[i];
+    let stock = stocks[i];
 
-    if(!stock) return;
-
-    if(cash >= stock.price){
+    if (cash >= stock.price) {
 
         cash -= stock.price;
 
         portfolio[stock.name] =
-        (portfolio[stock.name] || 0)
-        + 1;
-
-        log(
-            "🟢 Bought 1 share of "
-            + stock.name
-            + " for $"
-            + stock.price.toFixed(2)
-        );
+            (portfolio[stock.name] || 0) + 1;
 
         render();
 
@@ -452,50 +310,31 @@ function buy(i){
 
 }
 
-function sell(i){
+function sell(i) {
 
-    const stock = stocks[i];
+    let stock = stocks[i];
 
-    if(!stock) return;
-
-    if(
-        (portfolio[stock.name] || 0)
-        > 0
-    ){
+    if ((portfolio[stock.name] || 0) > 0) {
 
         portfolio[stock.name]--;
 
         cash += stock.price;
 
-        log(
-            "🔴 Sold 1 share of "
-            + stock.name
-            + " for $"
-            + stock.price.toFixed(2)
-        );
-
         render();
 
     }
 
 }
 
-function netWorth(){
+function netWorth() {
 
     let worth = cash;
 
-    stocks.forEach(stock=>{
+    stocks.forEach(s => {
 
         worth +=
-
-        (
-            portfolio[stock.name]
-            || 0
-        )
-
-        *
-
-        stock.price;
+            (portfolio[s.name] || 0)
+            * s.price;
 
     });
 
@@ -503,12 +342,11 @@ function netWorth(){
 
 }
 
-function prestigeRun(){
+function prestigeRun() {
 
-    const wealth =
-    netWorth();
+    let wealth = netWorth();
 
-    if(wealth < 10000){
+    if (wealth < 10000) {
 
         alert(
             "Need $10,000 net worth."
@@ -518,20 +356,17 @@ function prestigeRun(){
 
     }
 
-    const gain =
-    Math.max(
-        1,
+    let gain =
         Math.floor(
             Math.sqrt(
                 wealth / 10000
             )
-        )
-    );
+        );
 
     prestigeCurrency += gain;
 
     save.prestige =
-    prestigeCurrency;
+        prestigeCurrency;
 
     localStorage.setItem(
         "marketRogues",
@@ -539,24 +374,26 @@ function prestigeRun(){
     );
 
     alert(
-        "Gained "
-        + gain
-        + " prestige!"
+        "Prestiged for "
+        +
+        gain
+        +
+        " Prestige!"
     );
 
     location.reload();
 
 }
 
-function buyUpgrade(type){
+function buyUpgrade(type) {
 
-    if(prestigeCurrency <= 0)
+    if (prestigeCurrency <= 0)
         return;
 
     prestigeCurrency--;
 
     save.prestige =
-    prestigeCurrency;
+        prestigeCurrency;
 
     save.upgrades[type]++;
 
@@ -569,3 +406,208 @@ function buyUpgrade(type){
 
 }
 
+function render() {
+
+    document.getElementById(
+        "cash"
+    ).textContent =
+        Math.floor(cash);
+
+    document.getElementById(
+        "worth"
+    ).textContent =
+        Math.floor(netWorth());
+
+    document.getElementById(
+    "day"
+).textContent=
+day.toFixed(1);
+
+    document.getElementById(
+        "prestige"
+    ).textContent =
+        prestigeCurrency;
+
+    let stockHTML = "";
+
+    stocks.forEach((s, i) => {
+
+        let dailyColor =
+            s.dailyChange >= 0
+                ? "#44ff66"
+                : "#ff4444";
+
+        let riskColor =
+            s.risk > 70
+                ? "#ff4444"
+                :
+                s.risk > 40
+                    ? "#ffaa00"
+                    : "#44ff66";
+
+        stockHTML += `
+
+<div class="stock">
+
+<h3>${s.name}</h3>
+
+<b>
+$${s.price.toFixed(2)}
+</b>
+
+<br>
+
+<span style="
+color:${dailyColor};
+font-weight:bold;
+">
+
+${s.dailyChange >= 0 ? "+" : ""}
+${s.dailyChange.toFixed(2)}%
+
+</span>
+
+<hr>
+
+Sector:
+${s.sector}
+
+<br>
+
+Signal:
+${s.signal}
+
+<br>
+
+Growth:
+
+<span style="
+color:
+${s.growth >= 0
+                ? '#44ff66'
+                : '#ff4444'};
+">
+
+${s.growth >= 0 ? "+" : ""}
+${(s.growth * 100).toFixed(2)}%
+
+</span>
+
+<br>
+
+Momentum:
+${s.momentum.toFixed(1)}
+
+<br>
+
+Volatility:
+${(s.volatility * 100).toFixed(1)}%
+
+<br>
+
+Fundamentals:
+${s.fundamentals}
+
+<br>
+
+Hype:
+${s.hype}
+
+<br>
+
+Stability:
+${s.stability}
+
+<br>
+
+Risk:
+
+<span style="
+color:${riskColor};
+">
+
+${s.risk.toFixed(0)}
+
+</span>
+
+<hr>
+
+Owned:
+${portfolio[s.name] || 0}
+
+<br>
+
+Recent:
+
+<div style="
+font-size:11px;
+color:#999;
+">
+
+${s.history
+                .slice(-5)
+                .map(v => "$" + v.toFixed(0))
+                .join(" → ")}
+
+</div>
+
+<br>
+
+<button onclick="buy(${i})">
+Buy
+</button>
+
+<button onclick="sell(${i})">
+Sell
+</button>
+
+</div>
+
+`;
+
+    });
+
+    document.getElementById(
+        "stocks"
+    ).innerHTML =
+        stockHTML;
+
+    let phtml = "";
+
+    for (let key in portfolio) {
+
+        if (portfolio[key] > 0) {
+
+            phtml +=
+                key +
+                " x" +
+                portfolio[key] +
+                "<br>";
+
+        }
+
+    }
+
+    document.getElementById(
+        "portfolio"
+    ).innerHTML =
+        phtml ||
+        "None";
+
+    document.getElementById(
+        "upgradeInfo"
+    ).innerHTML =
+
+        `
+Cash Lv ${save.upgrades.cash}<br>
+Luck Lv ${save.upgrades.luck}<br>
+Scan Lv ${save.upgrades.scan}
+`;
+
+}
+
+render();
+
+setInterval(tick, 1000);
+
+log("📈 Market Open");
