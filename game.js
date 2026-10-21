@@ -10,7 +10,7 @@ let save = JSON.parse(localStorage.getItem("marketRogues")) || {
 
 };
 
-let day = 1;
+let day = 1.0;
 
 let cash =
     1000 *
@@ -189,7 +189,7 @@ function randomEvent() {
 
 function tick() {
 
-    day++;
+    day+= 0.2;
 
     if (hedgeDays > 0)
         hedgeDays--;
@@ -419,8 +419,9 @@ function render() {
         Math.floor(netWorth());
 
     document.getElementById(
-        "day"
-    ).textContent = day;
+    "day"
+).textContent=
+day.toFixed(1);
 
     document.getElementById(
         "prestige"
